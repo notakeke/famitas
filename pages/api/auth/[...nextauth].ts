@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
-import Providers from "next-auth/providers";
-import Adapters from "next-auth/adapters";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
+import GoogleProvider from "next-auth/providers/google";
 let prisma;
 
 if (process.env.NODE_ENV === "production") {
@@ -14,18 +14,11 @@ if (process.env.NODE_ENV === "production") {
 }
 const options = {
   providers: [
-    Providers.Google({
+    GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
-    //　プロバイダーは何個でも指定できる。
-    // https://next-auth.js.org/getting-started/introduction で一覧がみれる
-    // 例：
-    // Providers.Twitter({
-    //   clientId: process.env.TWITTER_CLIENT_ID,
-    //   clientSecret: process.env.TWITTER_CLIENT_SECRET,
-    // }),
   ],
-  adapter: Adapters.Prisma.Adapter({ prisma }),
+  adapter: PrismaAdapter(prisma),
 };
 export default (req, res) => NextAuth(req, res, options);
